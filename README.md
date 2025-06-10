@@ -21,7 +21,7 @@ This isn't just a basic prototype. It's a robust application with some killer fe
 We are open-sourcing InsightsLM so you can install it, customize it, improve it, and even commercialize it. The ability to deploy AI agents grounded in a company's specific knowledge (a concept known as Retrieval-Augmented Generation or RAG) represents one of the biggest commercial opportunities for generative AI today.
 
 <p align="center">
-  <img src="https://www.theaiautomators.com/wp-content/uploads/2025/06/Group-2651.svg" alt="The AI Automators Logo" width="600"/>
+  <img src="https://www.theaiautomators.com/wp-content/uploads/2024/04/TAIA-Logo-S2.png" alt="The AI Automators Logo" width="500"/>
 </p>
 
 ## Join Our Community
