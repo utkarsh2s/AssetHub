@@ -20,6 +20,16 @@ This isn't just a basic prototype. It's a robust application with some killer fe
 
 We are open-sourcing InsightsLM so you can install it, customize it, improve it, and even commercialize it. The ability to deploy AI agents grounded in a company's specific knowledge (a concept known as Retrieval-Augmented Generation or RAG) represents one of the biggest commercial opportunities for generative AI today.
 
+<p align="center">
+  <img src="https://www.theaiautomators.com/wp-content/uploads/2025/06/Group-2651.svg" alt="The AI Automators Logo" width="600"/>
+</p>
+
+## Join Our Community
+
+If you're interested in learning how to customize InsightsLM or build similar applications, join our community, The AI Automators.
+
+https://www.theaiautomators.com/
+
 ## Key Features
 
 * **Chat with Your Documents:** Upload your documents and get instant, context-aware answers.
@@ -75,23 +85,16 @@ This guide provides the quickest way to get InsightsLM up and running so you can
     * That's it! Your instance of InsightsLM should now be live.
     * You can now test the application, upload documents, and start chatting.
 
-## Frontend Development
+## Contributing
 
-If you want to edit the frontend code, there are several ways to get started.
+Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
-### Use your preferred local IDE
+- Fork the Project
+- Create your Feature Branch (git checkout -b feature/AmazingFeature)
+- Commit your Changes (git commit -m 'Add some AmazingFeature')
+- Push to the Branch (git push origin feature/AmazingFeature)
+- Open a Pull Request
 
-This is the recommended approach for developers. You must have Node.js and npm installed.
+## License
 
-```sh
-# 1. Clone the repository to your local machine.
-git clone <YOUR_GIT_URL>
-
-# 2. Navigate to the project directory.
-cd insights-lm-public
-
-# 3. Install the necessary dependencies.
-npm i
-
-# 4. Start the development server with auto-reloading.
-npm run dev
+Distributed under the MIT License.
