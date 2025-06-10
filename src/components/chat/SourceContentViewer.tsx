@@ -122,12 +122,14 @@ const SourceContentViewer = ({
 
   const getSourceIcon = (type: string) => {
     const iconMap: Record<string, string> = {
-      'pdf': 'https://yfvmutoxmibqzvyklggr.supabase.co/storage/v1/object/public/public-images//PDF.svg',
-      'text': 'https://yfvmutoxmibqzvyklggr.supabase.co/storage/v1/object/public/public-images//TXT.png',
-      'website': 'https://yfvmutoxmibqzvyklggr.supabase.co/storage/v1/object/public/public-images/WEB.svg',
-      'youtube': 'https://yfvmutoxmibqzvyklggr.supabase.co/storage/v1/object/public/public-images//MP3.png',
-      'audio': 'https://yfvmutoxmibqzvyklggr.supabase.co/storage/v1/object/public/public-images//MP3.png',
-      'doc': 'https://yfvmutoxmibqzvyklggr.supabase.co/storage/v1/object/public/public-images//DOC.png'
+      'pdf': '/file-types/PDF.svg',
+      'text': '/file-types/TXT.png',
+      'website': '/file-types/WEB.svg',
+      'youtube': '/file-types/MP3.png',
+      'audio': '/file-types/MP3.png',
+      'doc': '/file-types/DOC.png',
+      'multiple-websites': '/file-types/WEB.svg',
+      'copied-text': '/file-types/TXT.png'
     };
 
     const iconUrl = iconMap[type] || iconMap['text']; // fallback to TXT icon
