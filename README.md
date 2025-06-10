@@ -98,17 +98,22 @@ This guide provides the quickest way to get InsightsLM up and running so you can
 
 To run the React frontend locally:
 
-1. **Install Dependencies**
+1. **Clone the repository**
+    ```bash
+    git clone https://github.com/theaiautomators/insights-lm-public
+    cd insights-lm-public
+    ```
+2. **Install Dependencies**
     ```bash
     npm install
     ```
-2. **Start the Development Server**
+3. **Start the Development Server**
     ```bash
     npm run dev
     ```
     This will start the app at [http://localhost:5173](http://localhost:5173) by default.
 
-3. **Environment Variables**
+4. **Environment Variables**
     - Copy `.env.example` to `.env` and fill in your Supabase project credentials (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, etc.).
     - Make sure your Supabase project's `site_url` in `supabase/config.toml` matches your local dev URL (`http://localhost:5173`).
     - Make sure your Supabase project's `project_id` in `supabase/config.toml` matches your project ID
