@@ -62,7 +62,7 @@ This project is built with a modern, powerful stack:
     * [shadcn-ui](https://ui.shadcn.com/)
     * [Tailwind CSS](https://tailwindcss.com/)
 * **Backend:**
-    * [Supabase](https://supabase.io/) - for database, authentication, and storage.
+    * [Supabase](https://supabase.com/) - for database, authentication, and storage.
     * [N8N](https://n8n.io/) - for workflow automation and backend logic.
 
 
@@ -71,24 +71,32 @@ This project is built with a modern, powerful stack:
 This guide provides the quickest way to get InsightsLM up and running so you can test, customize, and experiment.
 
 1.  **Create Supabase Account and Project**
-    * Go to [Supabase.io](https://supabase.io/) and create a free account.
+    * Go to [Supabase.com](https://supabase.com/) and create a free account.
     * Create a new project. Make sure to save your Project URL, `anon` key, and `service_role` key. You will need these later.
 2.  **Create GitHub Account & Repo from Template**
     * If you don't have one, create a free account on [GitHub](https://github.com/).
     * Navigate to the InsightsLM template repository here: [**github.com/theaiautomators/insights-lm-public**](https://github.com/theaiautomators/insights-lm-public)
     * Click the `Use this template` button to create a copy of the repository in your own GitHub account.
-3.  **Import into an AI-Coding Editor (Bolt.net)**
-    * Create an account on an online IDE that supports Supabase integration, like [Bolt.net](https://bolt.net/).
+3.  **Import into an AI-Coding Editor (Bolt.new)**
+    * Create an account on on Bolt.new as it supports Supabase integration, like [Bolt.new](https://bolt.new/). (While the project was built on Loveable, it is quite difficult to import existing Github projects into Loveable)
     * Import your newly created GitHub repository into your Bolt project.
-    * Connect your Supabase project using the credentials you saved in Step 1.
+    * Connect your Supabase project.
     * Use the editor's built-in tools to deploy the Supabase backend (database schema, edge functions, storage buckets).
 4.  **Import and Configure N8N Workflows**
     * The `/n8n` directory in this repository contains the JSON files for the required N8N workflows.
     * In your N8N instance, import these workflow files.
-    * Configure the credentials for Supabase and any other services used in the workflows (e.g., OpenAI).
+    * Configure the credentials for Supabase and any other services used in the workflows (e.g., OpenAI). Follow the TODOs in each workflow.
 5.  **Add N8N Webhooks to Supabase Secrets**
     * Your N8N workflows will be triggered by webhooks. Copy the webhook URLs from your N8N canvas.
     * In your Supabase project dashboard, navigate to `Settings` -> `Secrets` and add the N8N webhook URLs as secrets. This allows the Supabase Edge Functions to securely call your N8N workflows.
+    * These are the secrets that need to be created
+    * NOTEBOOK_GENERATION_AUTH
+    * NOTEBOOK_CHAT_URL
+    * NOTEBOOK_GENERATION_URL
+    * AUDIO_GENERATION_WEBHOOK_URL
+    * DOCUMENT_PROCESSING_WEBHOOK_URL
+    * ADDITIONAL_SOURCES_WEBHOOK_URL
+    * OPENAI_API_KEY
 6.  **Test & Customize**
     * That's it! Your instance of InsightsLM should now be live.
     * You can now test the application, upload documents, and start chatting.
