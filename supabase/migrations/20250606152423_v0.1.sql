@@ -1,9 +1,16 @@
--- Core Database Setup Migration Script
--- This script sets up all necessary tables, RLS policies, triggers
+-- ============================================================================
+-- COMPLETE DATABASE MIGRATION SCRIPT
+-- This script recreates the entire database schema for the InsightsLM application
+-- ============================================================================
 
--- First, let's ensure we have the necessary extensions
+-- Enable required extensions
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-create extension vector;
+CREATE EXTENSION IF NOT EXISTS "vector";
+
+-- ============================================================================
+-- CUSTOM TYPES
+-- ============================================================================
 
 -- Create enum types
 DO $$ BEGIN
@@ -12,9 +19,14 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-create table public.n8n_chat_histories (
+-- ============================================================================
+-- CORE TABLES
+-- ============================================================================
+
+-- Create chat table (if it doesn't exist)
+CREATE TABLE IF NOT EXISTS public.n8n_chat_histories (
   id serial not null,
-  session_id character varying(255) not null,
+  session_id uuid not null,
   message jsonb not null,
   constraint n8n_chat_histories_pkey primary key (id)
 ) TABLESPACE pg_default;
@@ -84,73 +96,166 @@ CREATE TABLE IF NOT EXISTS public.documents (
     embedding vector(1536)
 );
 
+-- ============================================================================
+-- INDEXES
+-- ============================================================================
+
+-- Index for notebooks by user
+CREATE INDEX IF NOT EXISTS idx_notebooks_user_id ON public.notebooks(user_id);
+CREATE INDEX IF NOT EXISTS idx_notebooks_updated_at ON public.notebooks(updated_at DESC);
+
+-- Index for sources by notebook
+CREATE INDEX IF NOT EXISTS idx_sources_notebook_id ON public.sources(notebook_id);
+CREATE INDEX IF NOT EXISTS idx_sources_type ON public.sources(type);
+CREATE INDEX IF NOT EXISTS idx_sources_processing_status ON public.sources(processing_status);
+
+-- Index for notes by notebook
+CREATE INDEX IF NOT EXISTS idx_notes_notebook_id ON public.notes(notebook_id);
+
+-- Index for chat histories by session
+CREATE INDEX IF NOT EXISTS idx_chat_histories_session_id ON public.n8n_chat_histories(session_id);
+
+-- Vector similarity index for documents
+CREATE INDEX IF NOT EXISTS documents_embedding_idx ON public.documents USING hnsw (embedding vector_cosine_ops);
+
+-- ============================================================================
+-- DATABASE FUNCTIONS
+-- ============================================================================
+
+-- Function to handle new user creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    INSERT INTO public.profiles (id, email, full_name)
+    VALUES (
+        new.id,
+        new.email,
+        COALESCE(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name')
+    );
+    RETURN new;
+END;
+$$;
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    new.updated_at = timezone('utc'::text, now());
+    RETURN new;
+END;
+$$;
+
+-- Function to check notebook ownership
+CREATE OR REPLACE FUNCTION public.is_notebook_owner(notebook_id_param uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE SECURITY DEFINER
+AS $$
+    SELECT EXISTS (
+        SELECT 1 
+        FROM public.notebooks 
+        WHERE id = notebook_id_param 
+        AND user_id = auth.uid()
+    );
+$$;
+
+-- Function to check notebook ownership for documents
+CREATE OR REPLACE FUNCTION public.is_notebook_owner_for_document(doc_metadata jsonb)
+RETURNS boolean
+LANGUAGE sql
+STABLE SECURITY DEFINER
+AS $$
+    SELECT EXISTS (
+        SELECT 1 
+        FROM public.notebooks 
+        WHERE id = (doc_metadata->>'notebook_id')::uuid 
+        AND user_id = auth.uid()
+    );
+$$;
+
+-- Function to match documents using vector similarity
+CREATE OR REPLACE FUNCTION public.match_documents(
+    query_embedding vector,
+    match_count integer DEFAULT NULL,
+    filter jsonb DEFAULT '{}'::jsonb
+)
+RETURNS TABLE(
+    id bigint,
+    content text,
+    metadata jsonb,
+    similarity double precision
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        documents.id,
+        documents.content,
+        documents.metadata,
+        1 - (documents.embedding <=> query_embedding) as similarity
+    FROM public.documents
+    WHERE documents.metadata @> filter
+    ORDER BY documents.embedding <=> query_embedding
+    LIMIT match_count;
+END;
+$$;
+
+-- ============================================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- ============================================================================
+
 -- Enable RLS on all tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notebooks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.n8n_chat_histories ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies
-DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
-DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
-DROP POLICY IF EXISTS "Users can view own notebooks" ON public.notebooks;
-DROP POLICY IF EXISTS "Users can create own notebooks" ON public.notebooks;
-DROP POLICY IF EXISTS "Users can update own notebooks" ON public.notebooks;
-DROP POLICY IF EXISTS "Users can delete own notebooks" ON public.notebooks;
-DROP POLICY IF EXISTS "Users can view sources in own notebooks" ON public.sources;
-DROP POLICY IF EXISTS "Users can create sources in own notebooks" ON public.sources;
-DROP POLICY IF EXISTS "Users can update sources in own notebooks" ON public.sources;
-DROP POLICY IF EXISTS "Users can delete sources in own notebooks" ON public.sources;
-DROP POLICY IF EXISTS "Users can view notes in own notebooks" ON public.notes;
-DROP POLICY IF EXISTS "Users can create notes in own notebooks" ON public.notes;
-DROP POLICY IF EXISTS "Users can update notes in own notebooks" ON public.notes;
-DROP POLICY IF EXISTS "Users can delete notes in own notebooks" ON public.notes;
-DROP POLICY IF EXISTS "Public documents access" ON public.documents;
+-- Profiles policies
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
+CREATE POLICY "Users can view their own profile"
+    ON public.profiles FOR SELECT
+    USING (auth.uid() = id);
 
--- Profiles RLS
-CREATE POLICY "Users can view own profile" ON public.profiles
-    FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON public.profiles
-    FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+CREATE POLICY "Users can update their own profile"
+    ON public.profiles FOR UPDATE
+    USING (auth.uid() = id);
 
--- Notebooks RLS
-CREATE POLICY "Users can view own notebooks" ON public.notebooks
-    FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can create own notebooks" ON public.notebooks
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own notebooks" ON public.notebooks
-    FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own notebooks" ON public.notebooks
-    FOR DELETE USING (auth.uid() = user_id);
+-- Notebooks policies
+DROP POLICY IF EXISTS "Users can view their own notebooks" ON public.notebooks;
+CREATE POLICY "Users can view their own notebooks"
+    ON public.notebooks FOR SELECT
+    USING (auth.uid() = user_id);
 
--- Sources RLS
-CREATE POLICY "Users can view sources in own notebooks" ON public.sources
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.notebooks 
-            WHERE notebooks.id = sources.notebook_id 
-            AND notebooks.user_id = auth.uid()
-        )
-    );
-CREATE POLICY "Users can create sources in own notebooks" ON public.sources
-    FOR INSERT WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM public.notebooks 
-            WHERE notebooks.id = sources.notebook_id 
-            AND notebooks.user_id = auth.uid()
-        )
-    );
-CREATE POLICY "Users can update sources in own notebooks" ON public.sources
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM public.notebooks 
-            WHERE notebooks.id = sources.notebook_id 
-            AND notebooks.user_id = auth.uid()
-        )
-    );
-CREATE POLICY "Users can delete sources in own notebooks" ON public.sources
-    FOR DELETE USING (
+DROP POLICY IF EXISTS "Users can create their own notebooks" ON public.notebooks;
+CREATE POLICY "Users can create their own notebooks"
+    ON public.notebooks FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own notebooks" ON public.notebooks;
+CREATE POLICY "Users can update their own notebooks"
+    ON public.notebooks FOR UPDATE
+    USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete their own notebooks" ON public.notebooks;
+CREATE POLICY "Users can delete their own notebooks"
+    ON public.notebooks FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- Sources policies
+DROP POLICY IF EXISTS "Users can view sources from their notebooks" ON public.sources;
+CREATE POLICY "Users can view sources from their notebooks"
+    ON public.sources FOR SELECT
+    USING (
         EXISTS (
             SELECT 1 FROM public.notebooks 
             WHERE notebooks.id = sources.notebook_id 
@@ -158,33 +263,44 @@ CREATE POLICY "Users can delete sources in own notebooks" ON public.sources
         )
     );
 
--- Notes RLS
-CREATE POLICY "Users can view notes in own notebooks" ON public.notes
-    FOR SELECT USING (
+DROP POLICY IF EXISTS "Users can create sources in their notebooks" ON public.sources;
+CREATE POLICY "Users can create sources in their notebooks"
+    ON public.sources FOR INSERT
+    WITH CHECK (
         EXISTS (
             SELECT 1 FROM public.notebooks 
-            WHERE notebooks.id = notes.notebook_id 
+            WHERE notebooks.id = sources.notebook_id 
             AND notebooks.user_id = auth.uid()
         )
     );
-CREATE POLICY "Users can create notes in own notebooks" ON public.notes
-    FOR INSERT WITH CHECK (
+
+DROP POLICY IF EXISTS "Users can update sources in their notebooks" ON public.sources;
+CREATE POLICY "Users can update sources in their notebooks"
+    ON public.sources FOR UPDATE
+    USING (
         EXISTS (
             SELECT 1 FROM public.notebooks 
-            WHERE notebooks.id = notes.notebook_id 
+            WHERE notebooks.id = sources.notebook_id 
             AND notebooks.user_id = auth.uid()
         )
     );
-CREATE POLICY "Users can update notes in own notebooks" ON public.notes
-    FOR UPDATE USING (
+
+DROP POLICY IF EXISTS "Users can delete sources from their notebooks" ON public.sources;
+CREATE POLICY "Users can delete sources from their notebooks"
+    ON public.sources FOR DELETE
+    USING (
         EXISTS (
             SELECT 1 FROM public.notebooks 
-            WHERE notebooks.id = notes.notebook_id 
+            WHERE notebooks.id = sources.notebook_id 
             AND notebooks.user_id = auth.uid()
         )
     );
-CREATE POLICY "Users can delete notes in own notebooks" ON public.notes
-    FOR DELETE USING (
+
+-- Notes policies
+DROP POLICY IF EXISTS "Users can view notes from their notebooks" ON public.notes;
+CREATE POLICY "Users can view notes from their notebooks"
+    ON public.notes FOR SELECT
+    USING (
         EXISTS (
             SELECT 1 FROM public.notebooks 
             WHERE notebooks.id = notes.notebook_id 
@@ -192,33 +308,80 @@ CREATE POLICY "Users can delete notes in own notebooks" ON public.notes
         )
     );
 
--- Documents RLS
-CREATE POLICY "Public documents access" ON public.documents
-    FOR ALL USING (true);
-
--- Triggers
-CREATE OR REPLACE FUNCTION public.update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = timezone('utc'::text, now());
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.profiles (id, email, full_name)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data ->> 'full_name', NEW.raw_user_meta_data ->> 'name')
+DROP POLICY IF EXISTS "Users can create notes in their notebooks" ON public.notes;
+CREATE POLICY "Users can create notes in their notebooks"
+    ON public.notes FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.notebooks 
+            WHERE notebooks.id = notes.notebook_id 
+            AND notebooks.user_id = auth.uid()
+        )
     );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Drop old triggers if exist
+DROP POLICY IF EXISTS "Users can update notes in their notebooks" ON public.notes;
+CREATE POLICY "Users can update notes in their notebooks"
+    ON public.notes FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.notebooks 
+            WHERE notebooks.id = notes.notebook_id 
+            AND notebooks.user_id = auth.uid()
+        )
+    );
+
+DROP POLICY IF EXISTS "Users can delete notes from their notebooks" ON public.notes;
+CREATE POLICY "Users can delete notes from their notebooks"
+    ON public.notes FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.notebooks 
+            WHERE notebooks.id = notes.notebook_id 
+            AND notebooks.user_id = auth.uid()
+        )
+    );
+
+-- Documents policies
+DROP POLICY IF EXISTS "Users can view documents from their notebooks" ON public.documents;
+CREATE POLICY "Users can view documents from their notebooks"
+    ON public.documents FOR SELECT
+    USING (public.is_notebook_owner_for_document(metadata));
+
+DROP POLICY IF EXISTS "Users can create documents in their notebooks" ON public.documents;
+CREATE POLICY "Users can create documents in their notebooks"
+    ON public.documents FOR INSERT
+    WITH CHECK (public.is_notebook_owner_for_document(metadata));
+
+DROP POLICY IF EXISTS "Users can update documents in their notebooks" ON public.documents;
+CREATE POLICY "Users can update documents in their notebooks"
+    ON public.documents FOR UPDATE
+    USING (public.is_notebook_owner_for_document(metadata));
+
+DROP POLICY IF EXISTS "Users can delete documents from their notebooks" ON public.documents;
+CREATE POLICY "Users can delete documents from their notebooks"
+    ON public.documents FOR DELETE
+    USING (public.is_notebook_owner_for_document(metadata));
+
+-- Chat histories policies
+DROP POLICY IF EXISTS "Users can view chat histories from their notebooks" ON public.n8n_chat_histories;
+CREATE POLICY "Users can view chat histories from their notebooks"
+    ON public.n8n_chat_histories FOR SELECT
+    USING (public.is_notebook_owner(session_id::uuid));
+
+DROP POLICY IF EXISTS "Users can create chat histories in their notebooks" ON public.n8n_chat_histories;
+CREATE POLICY "Users can create chat histories in their notebooks"
+    ON public.n8n_chat_histories FOR INSERT
+    WITH CHECK (public.is_notebook_owner(session_id::uuid));
+
+DROP POLICY IF EXISTS "Users can delete chat histories from their notebooks" ON public.n8n_chat_histories;
+CREATE POLICY "Users can delete chat histories from their notebooks"
+    ON public.n8n_chat_histories FOR DELETE
+    USING (public.is_notebook_owner(session_id::uuid));
+
+-- ============================================================================
+-- TRIGGERS
+-- ============================================================================
+
 DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 DROP TRIGGER IF EXISTS update_notebooks_updated_at ON public.notebooks;
 DROP TRIGGER IF EXISTS update_sources_updated_at ON public.sources;
@@ -244,199 +407,146 @@ CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Enable realtime
+-- ============================================================================
+-- REALTIME CONFIGURATION
+-- ============================================================================
+
+-- Enable realtime for tables that need live updates
 ALTER TABLE public.notebooks REPLICA IDENTITY FULL;
 ALTER TABLE public.sources REPLICA IDENTITY FULL;
 ALTER TABLE public.notes REPLICA IDENTITY FULL;
-ALTER TABLE public.profiles REPLICA IDENTITY FULL;
+ALTER TABLE public.n8n_chat_histories REPLICA IDENTITY FULL;
 
+-- Add tables to realtime publication
 ALTER PUBLICATION supabase_realtime ADD TABLE public.notebooks;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.sources;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.notes;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.n8n_chat_histories;
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_notebooks_user_id ON public.notebooks(user_id);
-CREATE INDEX IF NOT EXISTS idx_sources_notebook_id ON public.sources(notebook_id);
-CREATE INDEX IF NOT EXISTS idx_notes_notebook_id ON public.notes(notebook_id);
-CREATE INDEX IF NOT EXISTS idx_documents_embedding ON public.documents USING hnsw (embedding vector_cosine_ops);
+-- =============================================
+-- Storage Buckets and Policies Migration
+-- =============================================
 
-
--- Storage Policies Migration Script
--- This script cleans up existing policies and creates proper RLS policies for all storage buckets
-
--- First, remove all existing conflicting policies
-DROP POLICY IF EXISTS "Allow authenticated users to upload files" ON storage.objects;
-DROP POLICY IF EXISTS "Allow users to view their own files" ON storage.objects;
-DROP POLICY IF EXISTS "Allow users to delete their own files" ON storage.objects;
-DROP POLICY IF EXISTS "Allow users to update their own files" ON storage.objects;
-DROP POLICY IF EXISTS "Public bucket access" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated users can upload to public bucket" ON storage.objects;
-DROP POLICY IF EXISTS "Everyone can view public bucket" ON storage.objects;
-DROP POLICY IF EXISTS "Users can delete from public bucket" ON storage.objects;
-DROP POLICY IF EXISTS "Users can update public bucket" ON storage.objects;
-DROP POLICY IF EXISTS "Audio bucket access for notebook owners" ON storage.objects;
-DROP POLICY IF EXISTS "Audio bucket upload for authenticated users" ON storage.objects;
-DROP POLICY IF EXISTS "Audio bucket view for notebook owners" ON storage.objects;
-DROP POLICY IF EXISTS "Audio bucket delete for notebook owners" ON storage.objects;
-DROP POLICY IF EXISTS "Audio bucket update for notebook owners" ON storage.objects;
-
--- Create a helper function to check notebook ownership
-CREATE OR REPLACE FUNCTION public.is_notebook_owner(notebook_id_param uuid)
-RETURNS boolean
-LANGUAGE sql
-SECURITY DEFINER
-STABLE
-AS $$
-  SELECT EXISTS (
-    SELECT 1 
-    FROM public.notebooks 
-    WHERE id = notebook_id_param 
-    AND user_id = auth.uid()
-  );
-$$;
-
--- SOURCES BUCKET POLICIES (Private files - notebook owners only)
--- Allow notebook owners to INSERT files into their notebook folders
-CREATE POLICY "Sources: Insert files for owned notebooks" ON storage.objects
-FOR INSERT
-TO authenticated
-WITH CHECK (
-  bucket_id = 'sources' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- Allow notebook owners to SELECT their files
-CREATE POLICY "Sources: View files from owned notebooks" ON storage.objects
-FOR SELECT
-TO authenticated
-USING (
-  bucket_id = 'sources' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- Allow notebook owners to UPDATE their files
-CREATE POLICY "Sources: Update files in owned notebooks" ON storage.objects
-FOR UPDATE
-TO authenticated
-USING (
-  bucket_id = 'sources' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- Allow notebook owners to DELETE their files
-CREATE POLICY "Sources: Delete files from owned notebooks" ON storage.objects
-FOR DELETE
-TO authenticated
-USING (
-  bucket_id = 'sources' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- AUDIO BUCKET POLICIES (Audio files - notebook owners only)
--- Allow notebook owners to INSERT audio files
-CREATE POLICY "Audio: Insert files for owned notebooks" ON storage.objects
-FOR INSERT
-TO authenticated
-WITH CHECK (
-  bucket_id = 'audio' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- Allow notebook owners to SELECT their audio files
-CREATE POLICY "Audio: View files from owned notebooks" ON storage.objects
-FOR SELECT
-TO authenticated
-USING (
-  bucket_id = 'audio' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- Allow notebook owners to UPDATE their audio files
-CREATE POLICY "Audio: Update files in owned notebooks" ON storage.objects
-FOR UPDATE
-TO authenticated
-USING (
-  bucket_id = 'audio' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- Allow notebook owners to DELETE their audio files
-CREATE POLICY "Audio: Delete files from owned notebooks" ON storage.objects
-FOR DELETE
-TO authenticated
-USING (
-  bucket_id = 'audio' 
-  AND public.is_notebook_owner((string_to_array(name, '/'))[1]::uuid)
-);
-
--- PUBLIC-IMAGES BUCKET POLICIES (Public files - all authenticated users)
--- Allow any authenticated user to INSERT public images
-CREATE POLICY "Public Images: Insert for authenticated users" ON storage.objects
-FOR INSERT
-TO authenticated
-WITH CHECK (bucket_id = 'public-images');
-
--- Allow anyone to SELECT public images (including anonymous users for public access)
-CREATE POLICY "Public Images: View for everyone" ON storage.objects
-FOR SELECT
-TO anon, authenticated
-USING (bucket_id = 'public-images');
-
--- Allow any authenticated user to UPDATE public images
-CREATE POLICY "Public Images: Update for authenticated users" ON storage.objects
-FOR UPDATE
-TO authenticated
-USING (bucket_id = 'public-images');
-
--- Allow any authenticated user to DELETE public images
-CREATE POLICY "Public Images: Delete for authenticated users" ON storage.objects
-FOR DELETE
-TO authenticated
-USING (bucket_id = 'public-images');
-
--- Update bucket configurations for better security and file management
-UPDATE storage.buckets 
-SET 
-  file_size_limit = 52428800, -- 50MB limit
-  allowed_mime_types = ARRAY[
+-- Create storage buckets
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES 
+  -- Sources bucket for user uploads (private)
+  ('sources', 'sources', false, 52428800, ARRAY[
     'application/pdf',
     'text/plain',
-    'audio/mpeg',
-    'audio/mp3',
-    'audio/wav',
-    'audio/ogg',
-    'audio/m4a',
-    'audio/aac',
-    'text/markdown',
+    'text/csv',
     'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  ]
-WHERE id = 'sources';
-
-UPDATE storage.buckets 
-SET 
-  file_size_limit = 104857600, -- 100MB limit for audio files
-  allowed_mime_types = ARRAY[
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'audio/mpeg',
-    'audio/mp3',
     'audio/wav',
-    'audio/ogg',
-    'audio/m4a',
-    'audio/aac'
-  ]
-WHERE id = 'audio';
-
-UPDATE storage.buckets 
-SET 
-  file_size_limit = 10485760, -- 10MB limit for images
-  allowed_mime_types = ARRAY[
+    'audio/mp4',
+    'audio/m4a'
+  ]),
+  
+  -- Audio bucket for generated content (private)
+  ('audio', 'audio', false, 104857600, ARRAY[
+    'audio/mpeg',
+    'audio/wav',
+    'audio/mp4',
+    'audio/m4a'
+  ]),
+  
+  -- Public images bucket for assets (public)
+  ('public-images', 'public-images', true, 10485760, ARRAY[
     'image/jpeg',
-    'image/jpg',
     'image/png',
     'image/gif',
     'image/webp',
     'image/svg+xml'
-  ]
-WHERE id = 'public-images';
+  ])
+ON CONFLICT (id) DO UPDATE SET
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types,
+  public = EXCLUDED.public;
 
+-- =============================================
+-- RLS POLICIES FOR SOURCES BUCKET
+-- =============================================
+
+-- Sources bucket policies (private - users can only access their own files)
+CREATE POLICY "Users can view their own source files"
+ON storage.objects FOR SELECT
+USING (
+  bucket_id = 'sources' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT id FROM notebooks WHERE user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can upload source files to their notebooks"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'sources' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT id FROM notebooks WHERE user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can update their own source files"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'sources' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT id FROM notebooks WHERE user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can delete their own source files"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'sources' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT id FROM notebooks WHERE user_id = auth.uid()
+  )
+);
+
+-- =============================================
+-- RLS POLICIES FOR AUDIO BUCKET
+-- =============================================
+
+-- Audio bucket policies (private - users can only access their own audio files)
+CREATE POLICY "Users can view their own audio files"
+ON storage.objects FOR SELECT
+USING (
+  bucket_id = 'audio' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT id FROM notebooks WHERE user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Service role can manage audio files"
+ON storage.objects FOR ALL
+USING (
+  bucket_id = 'audio' AND
+  auth.role() = 'service_role'
+);
+
+CREATE POLICY "Users can delete their own audio files"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'audio' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT id FROM notebooks WHERE user_id = auth.uid()
+  )
+);
+
+-- =============================================
+-- RLS POLICIES FOR PUBLIC-IMAGES BUCKET
+-- =============================================
+
+-- Public images bucket policies (public - anyone can read)
+CREATE POLICY "Anyone can view public images"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'public-images');
+
+CREATE POLICY "Service role can manage public images"
+ON storage.objects FOR ALL
+USING (
+  bucket_id = 'public-images' AND
+  auth.role() = 'service_role'
+);
