@@ -2,6 +2,7 @@
   <img src="https://www.theaiautomators.com/wp-content/uploads/2025/06/Group-2651.svg" alt="InsightsLM Logo" width="600"/>
 </p>
 
+
 # InsightsLM: Your Self-Hosted, Private NotebookLM Clone
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -12,6 +13,7 @@
 
 That's exactly what we've done with **InsightsLM**. This project is an open-source, self-hostable alternative to NotebookLM. It's designed to be a powerful AI research tool that grounds its responses exclusively in the sources you provide, making it a reliable window into your company's knowledge base.
 
+
 ## About The Project
 
 NotebookLM is one of the most powerful AI research tools available today. However, its closed-source nature limits its potential for customization and private hosting. InsightsLM was created to bridge this gap.
@@ -20,15 +22,18 @@ This isn't just a basic prototype. It's a robust application with some killer fe
 
 We are open-sourcing InsightsLM so you can install it, customize it, improve it, and even commercialize it. The ability to deploy AI agents grounded in a company's specific knowledge (a concept known as Retrieval-Augmented Generation or RAG) represents one of the biggest commercial opportunities for generative AI today.
 
+
 <p align="center">
   <img src="https://www.theaiautomators.com/wp-content/uploads/2024/04/TAIA-Logo-S2.png" alt="The AI Automators Logo" width="500"/>
 </p>
+
 
 ## Join Our Community
 
 If you're interested in learning how to customize InsightsLM or build similar applications, join our community, The AI Automators.
 
 https://www.theaiautomators.com/
+
 
 ## Key Features
 
@@ -39,11 +44,13 @@ https://www.theaiautomators.com/
 * **Customizable and Extensible:** Built with modern, accessible tools, making it easy to tailor to your specific needs.
 * **Low-Code/No-Code Foundation:** A testament to the power of modern AI-coding and automation platforms.
 
+
 ## Demo & Walkthrough
 
 For a complete demonstration of InsightsLM, an overview of its architecture, and a step-by-step guide on how to set it up, check out our YouTube video:
 
 [**Watch the full build and demo on YouTube!**](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
 
 ## Built With
 
@@ -58,7 +65,8 @@ This project is built with a modern, powerful stack:
     * [Supabase](https://supabase.io/) - for database, authentication, and storage.
     * [N8N](https://n8n.io/) - for workflow automation and backend logic.
 
-## Getting Started: A Guide for No-Coders
+
+## Getting Started: A Guide for No-Coders to Test and Customize
 
 This guide provides the quickest way to get InsightsLM up and running so you can test, customize, and experiment.
 
@@ -85,6 +93,64 @@ This guide provides the quickest way to get InsightsLM up and running so you can
     * That's it! Your instance of InsightsLM should now be live.
     * You can now test the application, upload documents, and start chatting.
 
+
+## Local Development
+
+To run the React frontend locally:
+
+1. **Install Dependencies**
+    ```bash
+    npm install
+    ```
+2. **Start the Development Server**
+    ```bash
+    npm run dev
+    ```
+    This will start the app at [http://localhost:5173](http://localhost:5173) by default.
+
+3. **Environment Variables**
+    - Copy `.env.example` to `.env` and fill in your Supabase project credentials (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, etc.).
+    - Make sure your Supabase project's `site_url` in `supabase/config.toml` matches your local dev URL (`http://localhost:5173`).
+    - Make sure your Supabase project's `project_id` in `supabase/config.toml` matches your project ID
+
+## Deploying to Supabase
+
+To deploy the backend (database schema, edge functions, and configuration) to your Supabase project:
+
+1. **Install Supabase CLI**  
+   If you haven't already:
+    ```bash
+    npm install -g supabase
+    ```
+
+2. **Login to Supabase**
+    ```bash
+    supabase login
+    ```
+
+3. **Link Your Project**
+    ```bash
+    supabase link --project-ref <your-project-ref>
+    ```
+
+4. **Deploy Database Schema**
+    ```bash
+    supabase db push
+    ```
+
+5. **Deploy Edge Functions**
+    ```bash
+    supabase functions deploy <function-name>
+    ```
+    Or deploy all functions in the `supabase/functions` directory as needed.
+
+6. **Update Configurations**
+    - Edit `supabase/config.toml` as needed.
+    - Use the Supabase dashboard to update secrets and environment variables (such as N8N webhook URLs).
+
+For more details, see the [Supabase CLI documentation](https://supabase.com/docs/guides/cli).
+
+
 ## Contributing
 
 Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
@@ -94,6 +160,7 @@ Contributions make the open-source community an amazing place to learn, inspire,
 - Commit your Changes (git commit -m 'Add some AmazingFeature')
 - Push to the Branch (git push origin feature/AmazingFeature)
 - Open a Pull Request
+
 
 ## License
 
