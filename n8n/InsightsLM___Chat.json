@@ -58,8 +58,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        80,
-        920
+        160,
+        180
       ],
       "id": "c0ab0348-109e-433b-8feb-01619ca26928",
       "name": "OpenAI Chat Model",
@@ -150,33 +150,6 @@
     },
     {
       "parameters": {
-        "model": {
-          "__rl": true,
-          "mode": "list",
-          "value": "claude-3-7-sonnet-20250219",
-          "cachedResultName": "Claude 3.7 Sonnet"
-        },
-        "options": {
-          "thinking": false
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
-      "typeVersion": 1.3,
-      "position": [
-        160,
-        160
-      ],
-      "id": "a147e466-bdba-421a-a84a-25682d93d9b6",
-      "name": "Anthropic Chat Model",
-      "credentials": {
-        "anthropicApi": {
-          "id": "LIuOf61utMGpqNxm",
-          "name": "Anthropic account LL"
-        }
-      }
-    },
-    {
-      "parameters": {
         "jsonSchemaExample": "{\n\t\"output\": [\n  {\n    \"text\": \"Formula 1 (also known as Formula One) is a premier motorsport championship organized by the FIA...\",\n    \"citations\": [\n      {\n        \"chunk_index\": 0,\n        \"chunk_source_id\": \"701bd18c-2531-48e5-8d09-df22e7cc3d21\",\n        \"chunk_lines_from\": 25,\n        \"chunk_lines_to\": 50\n      }\n    ]\n  },\n  {\n    \"text\": \"Formula 1 (also known as Formula One) is a premier motorsport championship organized by the FIA...\",\n    \"citations\": [\n      {\n        \"chunk_index\": 0,\n        \"chunk_source_id\": \"701bd18c-2531-48e5-8d09-df22e7cc3d21\",\n        \"chunk_lines_from\": 25,\n        \"chunk_lines_to\": 50\n      }\n    ]\n  }\n]\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
@@ -262,7 +235,13 @@
     },
     "OpenAI Chat Model": {
       "ai_languageModel": [
-        []
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
       ]
     },
     "Postgres Chat Memory": {
@@ -298,17 +277,6 @@
         ]
       ]
     },
-    "Anthropic Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Structured Output Parser": {
       "ai_outputParser": [
         [
@@ -325,7 +293,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "e8b730f9-4b1d-43f7-9ac6-54b66e9aee64",
+  "versionId": "d25723a7-96b6-4a75-ba02-ee10fdc36f7d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"
