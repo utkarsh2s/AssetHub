@@ -53,7 +53,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $json.file_url }}",
+        "url": "={{ $json.file_url }}?cacheBust={{ $now.toISO() }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -621,7 +621,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "df41f46a-fa8c-4683-b2f8-166723cdd30a",
+  "versionId": "db465344-fcc6-4f47-a3e7-8669745ec628",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"
