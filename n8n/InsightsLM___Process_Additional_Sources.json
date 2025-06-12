@@ -5,6 +5,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "670882ea-5c1e-4b50-9f41-4792256af985",
+        "authentication": "headerAuth",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -15,7 +16,13 @@
       ],
       "id": "e84393f1-d235-49b6-ae80-14fab4c2eaf3",
       "name": "Webhook",
-      "webhookId": "670882ea-5c1e-4b50-9f41-4792256af985"
+      "webhookId": "670882ea-5c1e-4b50-9f41-4792256af985",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "39evQ95L86jhtb3I",
+          "name": "MyNoteBookLM Auth"
+        }
+      }
     },
     {
       "parameters": {
@@ -565,7 +572,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "0809fde1-d51f-4ee6-b89f-bbd4b23b4878",
+  "versionId": "9ceb5f5d-3f2f-473e-af61-9e38ee1ebb1d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"
