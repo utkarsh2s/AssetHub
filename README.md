@@ -3,13 +3,13 @@
 </p>
 
 
-# InsightsLM: Your Self-Hosted, Private NotebookLM Clone
+# InsightsLM: The Open Source NotebookLM Alternative
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/theaiautomators/insights-lm-public?style=social)](https://github.com/theaiautomators/insights-lm-public/stargazers)
 [![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20the%20Build-red)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
-> What if the power of a tool like NotebookLM wasn't locked away in a closed system? What if you could build a private, self-hosted clone that can be customized for your business needs, all without writing a single line of code?
+> What if the power of a tool like NotebookLM wasn't locked away in a closed system? What if you could build a private, self-hosted alternative that can be customized for your business needs, all without writing a single line of code?
 
 That's exactly what we've done with **InsightsLM**. This project is an open-source, self-hostable alternative to NotebookLM. It's designed to be a powerful AI research tool that grounds its responses exclusively in the sources you provide, making it a reliable window into your company's knowledge base.
 
