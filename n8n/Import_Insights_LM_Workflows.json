@@ -168,7 +168,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Loop over each input item passed to this node\nfor (const item of $input.all()) {\n  // Convert the JSON object of the current item into a string\n  let dataString = JSON.stringify(item.json);\n\n  // Perform the find-and-replace operations on the string version of the JSON.\n  // The 'g' flag in the regular expression ensures all instances are replaced.\n  const updatedString = dataString\n    .replace(/AzZ5a2zCGU1O3MRV/g, $('n8n').first().json.id);\n\n  // Convert the modified string back into a JSON object and\n  // overwrite the original JSON data of the item.\n  item.json = JSON.parse(updatedString);\n}\n\n// Return all the modified items to be passed to the next node in the workflow.\nreturn $input.all();"
+        "jsCode": "// Loop over each input item passed to this node\nfor (const item of $input.all()) {\n  // Convert the JSON object of the current item into a string\n  let dataString = JSON.stringify(item.json);\n\n  // Perform the find-and-replace operations on the string version of the JSON.\n  // The 'g' flag in the regular expression ensures all instances are replaced.\n  const updatedString = dataString\n    .replace(/AzZ5a2zCGU1O3MRV/g, $('n8n').first(0,0).json.id);\n\n  // Convert the modified string back into a JSON object and\n  // overwrite the original JSON data of the item.\n  item.json = JSON.parse(updatedString);\n}\n\n// Return all the modified items to be passed to the next node in the workflow.\nreturn $input.all();"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -220,43 +220,43 @@
             {
               "id": "866c90b8-42da-4178-93ce-26665d38d5ee",
               "name": "Enter Supabase Project ID",
-              "value": "1",
+              "value": "",
               "type": "string"
             },
             {
               "id": "0c78076e-6b86-4521-9f56-53bf537deb7d",
               "name": "Enter your n8n Supabase Credential ID",
-              "value": "2",
+              "value": "",
               "type": "string"
             },
             {
               "id": "a08496dd-25cb-4905-81a5-15fe8bb73c87",
               "name": "Enter the n8n Custom Webhook Header Auth ID",
-              "value": "3",
+              "value": "",
               "type": "string"
             },
             {
               "id": "8adb8fb6-9daf-4385-bfce-547e0b982a8e",
               "name": "Enter the n8n Postgres Credential ID",
-              "value": "4",
+              "value": "",
               "type": "string"
             },
             {
               "id": "a78cb031-db06-4b0f-9edd-50d231ee068f",
               "name": "Enter the n8n Google Gemini (PaLM) Credential ID",
-              "value": "5",
+              "value": "",
               "type": "string"
             },
             {
               "id": "de05aeff-fa19-4da9-b37d-db62cf8c8b20",
               "name": "Enter the n8n OpenAI Credential ID",
-              "value": "6",
+              "value": "",
               "type": "string"
             },
             {
               "id": "2ae2acd0-422f-4f37-bb94-70859c9e7f69",
               "name": "Enter your n8n Base URL (The part before the first single slash)",
-              "value": "7",
+              "value": "",
               "type": "string"
             }
           ]
@@ -621,7 +621,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "0a712f9a-28ed-4f1d-8c55-3b516572e680",
+  "versionId": "df41f46a-fa8c-4683-b2f8-166723cdd30a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"
