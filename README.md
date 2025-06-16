@@ -72,6 +72,8 @@ This project is built with a modern, powerful stack:
 
 This guide provides the quickest way to get InsightsLM up and running so you can test, customize, and experiment.
 
+I recommend you following along from 17:53 in our video here for the full step by step guide - [https://youtu.be/IXJEGjfZRBE?t=1073](https://youtu.be/IXJEGjfZRBE?t=1073)
+
 You will need a notepad file open to copy and paste in various credentials and details.
 
 1.  **Create Supabase Account and Project**
