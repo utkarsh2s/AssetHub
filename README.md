@@ -7,7 +7,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/theaiautomators/insights-lm-public?style=social)](https://github.com/theaiautomators/insights-lm-public/stargazers)
-[![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20the%20Build-red)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+[![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20the%20Build-red)](https://www.youtube.com/watch?v=IXJEGjfZRBE)
 
 > What if the power of a tool like NotebookLM wasn't locked away in a closed system? What if you could build a private, self-hosted alternative that can be customized for your business needs, all without writing a single line of code?
 
@@ -48,13 +48,14 @@ https://www.theaiautomators.com/
 
 For a complete demonstration of InsightsLM, an overview of its architecture, and a step-by-step guide on how to set it up, check out our YouTube video:
 
-[**Watch the full build and demo on YouTube!**](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+[**Watch the full build and demo on YouTube!**](https://www.youtube.com/watch?v=IXJEGjfZRBE)
 
 
 ## Built With
 
 This project is built with a modern, powerful stack:
-* **Frontend:** [Loveable](https://www.loveable.dev/)
+* **Frontend:** 
+    * [Loveable](https://theaiautomators.com/go/loveable)
     * [Vite](https://vitejs.dev/)
     * [React](https://react.dev/)
     * [TypeScript](https://www.typescriptlang.org/)
@@ -62,7 +63,7 @@ This project is built with a modern, powerful stack:
     * [Tailwind CSS](https://tailwindcss.com/)
 * **Backend:**
     * [Supabase](https://supabase.com/) - for database, authentication, and storage.
-    * [N8N](https://n8n.io/) - for workflow automation and backend logic.
+    * [N8N](https://theaiautomators.com/go/n8n) - for workflow automation and backend logic.
 
 
 ## Getting Started: A Guide for No-Coders to Test and Customize
