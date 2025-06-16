@@ -48,7 +48,9 @@ https://www.theaiautomators.com/
 
 For a complete demonstration of InsightsLM, an overview of its architecture, and a step-by-step guide on how to set it up, check out our YouTube video:
 
-[**Watch the full build and demo on YouTube!**](https://www.youtube.com/watch?v=IXJEGjfZRBE)
+<p>
+  <a target="_blank" href="https://www.youtube.com/watch?v=IXJEGjfZRBE"><img src="https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/public/video.png" alt="Video" width="500"/></a>
+</p>
 
 
 ## Built With
