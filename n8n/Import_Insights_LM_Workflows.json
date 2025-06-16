@@ -431,7 +431,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        0,
+        220,
         -340
       ],
       "id": "90c1b637-8da6-46f9-9560-f5dc04c01808",
@@ -452,6 +452,21 @@
       ],
       "id": "3f459a8d-b55c-4851-9b56-cd5911310f76",
       "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "[![The AI Automators](https://www.theaiautomators.com/wp-content/uploads/2025/03/gray-logo.png)](https://www.theaiautomators.com/)",
+        "width": 340,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -340
+      ],
+      "id": "128358e2-08f0-45e5-a071-c5c2918dea88",
+      "name": "Sticky Note8"
     }
   ],
   "pinData": {},
@@ -621,7 +636,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "db465344-fcc6-4f47-a3e7-8669745ec628",
+  "versionId": "67ee3da4-f5a8-49f6-bdfd-fde3da9d1698",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"

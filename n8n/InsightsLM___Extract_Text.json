@@ -246,6 +246,22 @@
       ],
       "id": "a550ac25-8226-46af-8c55-5f42f1abd0e9",
       "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "[![The AI Automators](https://www.theaiautomators.com/wp-content/uploads/2025/03/gray-logo.png)](https://www.theaiautomators.com/)\n## InsightsLM\nhttps://github.com/theaiautomators/insights-lm-public",
+        "height": 220,
+        "width": 280,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        60,
+        -200
+      ],
+      "id": "3f1e49b6-b7b4-49d0-a2e7-c50ab1cd8f3d",
+      "name": "Sticky Note8"
     }
   ],
   "pinData": {},
@@ -346,7 +362,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "6565e1a7-7fda-4523-8b56-4559eb1d5643",
+  "versionId": "28c069b3-6e86-4169-82b3-50bcfad834f7",
   "meta": {
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"
   },

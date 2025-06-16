@@ -3,6 +3,135 @@
   "nodes": [
     {
       "parameters": {
+        "command": "if ffmpeg -version > /dev/null 2>&1; then\n  echo \"FFmpeg is installed\"\nelse\n  echo \"FFmpeg is NOT installed\"\nfi\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        1320
+      ],
+      "id": "b804e4c1-5f49-4fb6-943b-92f183c302a9",
+      "name": "Check is FFMPEG Installed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05ef5c0e-fe71-4367-a88d-6ba65b8e4e48",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "=FFmpeg is installed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3e8219ed-4cfb-4706-b6c0-6cdf4e1d1c3b",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -200,
+        1320
+      ],
+      "id": "3adf9104-7091-4b88-b45b-efdb219c7742",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n    \"message\": \"Workflow was started\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        100,
+        1200
+      ],
+      "id": "54c2c7a8-af45-488e-9439-997d43ca2676",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"FFmpeg not installed\",\n  \"code\": \"FFMPEG_NOT_INSTALLED\",\n  \"details\": \"The server requires ffmpeg to be installed\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        100,
+        1380
+      ],
+      "id": "2b492335-fad2-4981-8c5c-bd790256bddd",
+      "name": "Respond with 500 Error"
+    },
+    {
+      "parameters": {
+        "content": "## To Do \n- REQUIREMENT: FFMPEG needs to be installed on your server for this workflow to succeed\n- Configure the Supabase nodes to reference your Project\n- Configure your Google Cloud API credentials\n- Update the Host of the \"HTTP Requests\" to hit your project",
+        "width": 680,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2040,
+        840
+      ],
+      "id": "73fb9911-4a7c-413b-8bb9-9ec86a3f501e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4c4699bc-004b-4ca3-8923-373ddd4a274e",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        1320
+      ],
+      "id": "36040655-7e2a-4af2-8524-f0e84fa2c874",
+      "name": "Webhook",
+      "webhookId": "4c4699bc-004b-4ca3-8923-373ddd4a274e",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "39evQ95L86jhtb3I",
+          "name": "MyNoteBookLM Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
         "operation": "getAll",
         "tableId": "sources",
         "returnAll": true,
@@ -11,7 +140,7 @@
             {
               "keyName": "notebook_id",
               "condition": "eq",
-              "keyValue": "={{ $json.body.notebook_id }}"
+              "keyValue": "={{ $('Webhook').item.json.body.notebook_id }}"
             }
           ]
         }
@@ -19,10 +148,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        140,
-        0
+        360,
+        1200
       ],
-      "id": "728c28fa-e8a1-4fad-8ecf-148fc11c084b",
+      "id": "2bf3e04b-7472-4a31-80e3-c78fb8f742be",
       "name": "Get Sources",
       "credentials": {
         "supabaseApi": {
@@ -30,6 +159,22 @@
           "name": "MynotebookLM Supabase"
         }
       }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title,content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        580,
+        1200
+      ],
+      "id": "30a71143-107d-4c02-a43f-54d972c42437",
+      "name": "Aggregate"
     },
     {
       "parameters": {
@@ -48,11 +193,54 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        620,
-        0
+        840,
+        1200
       ],
-      "id": "2c70bf70-f988-4382-89e1-4c4e95564725",
+      "id": "a12a3968-6929-489f-a497-a837f3c7e13c",
       "name": "Set Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1100,
+        1180
+      ],
+      "id": "25ae0627-f92b-4fa3-8722-6ce6cb678697",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        1400
+      ],
+      "id": "a805fc31-c265-49cc-8a95-e79ec7311783",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "hNalDChhNUDtYG7T",
+          "name": "OpenAi account"
+        }
+      }
     },
     {
       "parameters": {
@@ -68,10 +256,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1300,
-        -20
+        1520,
+        1180
       ],
-      "id": "195e089f-a495-440e-9899-a055ac240ab2",
+      "id": "acf52aa8-77ad-41ba-8b27-66f496be6454",
       "name": "Generate Audio",
       "retryOnFail": true,
       "waitBetweenTries": 5000,
@@ -85,40 +273,6 @@
     },
     {
       "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "include": "specifiedFields",
-        "fieldsToInclude": "title,content",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        360,
-        0
-      ],
-      "id": "f9c45c29-7601-4381-a7b4-524389f1760d",
-      "name": "Aggregate"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.prompt }}",
-        "batching": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.7,
-      "position": [
-        880,
-        -20
-      ],
-      "id": "9412ecba-2462-45cd-9f57-624684035500",
-      "name": "Basic LLM Chain",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "maxTries": 5
-    },
-    {
-      "parameters": {
         "operation": "toBinary",
         "sourceProperty": "candidates[0].content.parts[0].inlineData.data",
         "options": {
@@ -129,24 +283,11 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        1520,
-        -20
+        1740,
+        1180
       ],
-      "id": "4e8c24ab-2ec0-4fce-8301-a8071af16ae6",
+      "id": "0c297369-7ff9-45f8-be19-83191b69a676",
       "name": "Convert to File"
-    },
-    {
-      "parameters": {
-        "command": "=ffmpeg -f s16le -ar 24000 -ac 1 -i /tmp/{{ $('Generate Audio').item.json.responseId }}-in.pcm -codec:a libmp3lame -qscale:a 2 /tmp/{{ $('Generate Audio').item.json.responseId }}-out.mp3"
-      },
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
-      "position": [
-        1980,
-        -20
-      ],
-      "id": "4aa5075a-3e69-49e8-8b3e-9ad8793907bb",
-      "name": "Execute Command"
     },
     {
       "parameters": {
@@ -157,11 +298,24 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        1740,
-        -20
+        1960,
+        1180
       ],
-      "id": "9358e46b-ffc3-4146-884c-fb779a90c133",
+      "id": "d6a89506-9cd2-4486-85a1-be20060d5d04",
       "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -f s16le -ar 24000 -ac 1 -i /tmp/{{ $('Generate Audio').item.json.responseId }}-in.pcm -codec:a libmp3lame -qscale:a 2 /tmp/{{ $('Generate Audio').item.json.responseId }}-out.mp3"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        1180
+      ],
+      "id": "d3f96ec9-2373-4ca7-8282-c078de61b92b",
+      "name": "Execute Command"
     },
     {
       "parameters": {
@@ -171,10 +325,10 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        2200,
-        -20
+        2420,
+        1180
       ],
-      "id": "f79406aa-d7bf-4503-89de-9eb95d040283",
+      "id": "5d91d055-300e-4a33-b3e9-fac3b25dd3e0",
       "name": "Read/Write Files from Disk1"
     },
     {
@@ -202,13 +356,13 @@
           }
         }
       },
-      "id": "466ee12e-9c0e-43e2-9d44-1c1a199261e1",
+      "id": "65a6bb6c-99e1-4e17-ac97-95bf0e23a954",
       "name": "Upload object",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        2420,
-        -20
+        2640,
+        1180
       ],
       "credentials": {
         "supabaseApi": {
@@ -231,10 +385,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2620,
-        -20
+        2840,
+        1180
       ],
-      "id": "c538b58f-a72b-481d-851f-1abdd55dcb87",
+      "id": "f05a5230-c0c5-4b55-b50c-57b1a3c4df83",
       "name": "Generate Signed URL",
       "credentials": {
         "supabaseApi": {
@@ -245,26 +399,16 @@
     },
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "4c4699bc-004b-4ca3-8923-373ddd4a274e",
-        "authentication": "headerAuth",
-        "options": {}
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  const now = new Date();\n  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Add 1 day in ms\n  item.json.timestamp = tomorrow.toISOString(); // Compatible with Supabase timestampz\n}\n\nreturn $input.all();\n"
       },
-      "type": "n8n-nodes-base.webhook",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -80,
-        0
+        3080,
+        1180
       ],
-      "id": "9ee489cd-f985-4498-b985-13af8f029d3c",
-      "name": "Webhook",
-      "webhookId": "4c4699bc-004b-4ca3-8923-373ddd4a274e",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "39evQ95L86jhtb3I",
-          "name": "MyNoteBookLM Auth"
-        }
-      }
+      "id": "8d5764b9-498a-4a73-a62a-69ccb6fa5716",
+      "name": "Generate Timestamp for Expires"
     },
     {
       "parameters": {
@@ -299,10 +443,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3120,
-        -20
+        3340,
+        1180
       ],
-      "id": "99f4fcbe-c909-44be-94b1-f3224cae7e03",
+      "id": "e549327c-f98e-4119-82b0-92c8e902fd06",
       "name": "Supabase",
       "credentials": {
         "supabaseApi": {
@@ -313,76 +457,79 @@
     },
     {
       "parameters": {
-        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  const now = new Date();\n  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Add 1 day in ms\n  item.json.timestamp = tomorrow.toISOString(); // Compatible with Supabase timestampz\n}\n\nreturn $input.all();\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2860,
-        -20
-      ],
-      "id": "7802caa7-1374-411e-9445-ab65283990f8",
-      "name": "Generate Timestamp for Expires"
-    },
-    {
-      "parameters": {
-        "content": "## To Do \n- REQUIREMENT: FFMPEG needs to be installed on your server for this workflow to succeed\n- Configure the Supabase nodes to reference your Project\n- Configure your Google Cloud API credentials\n- Update the Host of the \"HTTP Requests\" to hit your project",
-        "width": 680,
-        "color": 4
+        "content": "[![The AI Automators](https://www.theaiautomators.com/wp-content/uploads/2025/03/gray-logo.png)](https://www.theaiautomators.com/)\n## InsightsLM\nhttps://github.com/theaiautomators/insights-lm-public",
+        "height": 220,
+        "width": 280,
+        "color": 7
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1820,
-        -360
+        -680,
+        900
       ],
-      "id": "a658bb43-9268-490d-86cd-3dcd6b69427c",
-      "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-4.1",
-          "mode": "list",
-          "cachedResultName": "gpt-4.1"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.2,
-      "position": [
-        880,
-        200
-      ],
-      "id": "c8cae82f-8fc9-4604-8dd0-1ce53e18a15d",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "hNalDChhNUDtYG7T",
-          "name": "OpenAi account"
-        }
-      }
+      "id": "f1d8ead0-76e7-4a47-8399-969861b08a46",
+      "name": "Sticky Note8"
     }
   ],
   "pinData": {},
   "connections": {
-    "Get Sources": {
+    "Check is FFMPEG Installed": {
       "main": [
         [
           {
-            "node": "Aggregate",
+            "node": "If",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Set Prompt": {
+    "If": {
       "main": [
         [
           {
-            "node": "Basic LLM Chain",
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond with 500 Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check is FFMPEG Installed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sources": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
             "type": "main",
             "index": 0
           }
@@ -400,12 +547,34 @@
         ]
       ]
     },
+    "Set Prompt": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Basic LLM Chain": {
       "main": [
         [
           {
             "node": "Generate Audio",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -477,17 +646,6 @@
         ]
       ]
     },
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Get Sources",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Generate Signed URL": {
       "main": [
         [
@@ -497,11 +655,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Supabase": {
-      "main": [
-        []
       ]
     },
     "Generate Timestamp for Expires": {
@@ -514,24 +667,13 @@
           }
         ]
       ]
-    },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Basic LLM Chain",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "9db65174-243e-4e05-aae2-9c9a4213596e",
+  "versionId": "f228bda4-191c-47b3-a8b0-e8e16d374eb5",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b5d1ea132a4e071e6288b3143f31284b91560858bdef3f0c88a49f587fc91a29"
