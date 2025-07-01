@@ -46,7 +46,13 @@
         340
       ],
       "id": "c94ea89c-1a4a-4911-94b4-e5512884a0a9",
-      "name": "Get Sources"
+      "name": "Get Sources",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "MynotebookLM Supabase"
+        }
+      }
     },
     {
       "parameters": {
@@ -140,7 +146,7 @@
       ],
       "credentials": {
         "supabaseApi": {
-          "id": "Xu0KXGzWTonMg1Rz",
+          "id": "OeYUddl4OaIohMCC",
           "name": "Supabase account"
         }
       }
@@ -166,7 +172,7 @@
       "name": "Generate Signed URL",
       "credentials": {
         "supabaseApi": {
-          "id": "Xu0KXGzWTonMg1Rz",
+          "id": "OeYUddl4OaIohMCC",
           "name": "Supabase account"
         }
       }
@@ -221,7 +227,13 @@
         340
       ],
       "id": "054c3972-3250-40ee-b9dc-aabb79f8f1f5",
-      "name": "Supabase"
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "MynotebookLM Supabase"
+        }
+      }
     },
     {
       "parameters": {
