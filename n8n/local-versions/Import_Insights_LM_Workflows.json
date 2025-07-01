@@ -9,10 +9,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -940,
-        820
+        960,
+        760
       ],
-      "id": "aedb20bf-1db7-4b3c-89d9-8b5d9a539e9f",
+      "id": "6750e66b-47d0-479e-b946-924121080a07",
       "name": "Split Out"
     },
     {
@@ -22,10 +22,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -720,
-        820
+        1180,
+        760
       ],
-      "id": "ab911f74-515f-493a-84d4-4438d1bdfd30",
+      "id": "1f0bca13-3352-4afd-9839-dae832117716",
       "name": "Loop Over Items"
     },
     {
@@ -36,10 +36,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -440,
-        360
+        1460,
+        300
       ],
-      "id": "51c815b6-11d7-425f-ab91-59c94f2179d1",
+      "id": "f8f39034-bd23-4540-8ac6-de2ef2a123d1",
       "name": "Download Workflow File"
     },
     {
@@ -49,10 +49,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -220,
-        360
+        1680,
+        300
       ],
-      "id": "8ae63ba1-eee4-4cb6-8eac-85f5b5b05734",
+      "id": "fe3f64de-e622-490f-b136-c7e29e5270db",
       "name": "Find and Replace"
     },
     {
@@ -137,10 +137,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        20,
-        340
+        1920,
+        280
       ],
-      "id": "55182d80-e015-45bd-953c-f58edf828892",
+      "id": "263b1d4f-b06d-45db-ac22-58ff311d0626",
       "name": "Switch"
     },
     {
@@ -150,10 +150,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        300,
-        120
+        2200,
+        60
       ],
-      "id": "f6b306c4-891f-4e58-8e67-6690444c8b37",
+      "id": "0a09a576-62c8-4718-92f1-27be893ca5d9",
       "name": "Update Extract Text Workflow Reference"
     },
     {
@@ -163,10 +163,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        300,
-        300
+        2200,
+        240
       ],
-      "id": "c4e5118a-4a3d-49be-be99-9668088c5e7d",
+      "id": "a1f450da-c138-4f47-b1f9-6cee909458e4",
       "name": "Update Vector Upsert Workflow Reference"
     },
     {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.n8n",
       "typeVersion": 1,
       "position": [
-        740,
-        480
+        2640,
+        420
       ],
-      "id": "fa483fb6-7149-4217-a1c8-376799f22679",
+      "id": "53abb382-df64-4ea6-aa59-a624994d5aff",
       "name": "n8n",
       "credentials": {
         "n8nApi": {
@@ -225,10 +225,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1680,
-        820
+        220,
+        760
       ],
-      "id": "5e4c0b92-806d-41ea-9a74-e88d5ae88600",
+      "id": "6af65cbe-bebb-4552-8372-0e9a4c668167",
       "name": "Enter User Values"
     },
     {
@@ -236,10 +236,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -1920,
-        820
+        -20,
+        760
       ],
-      "id": "8f47ed60-5d4a-4a2e-a7f8-13721302cda3",
+      "id": "b916caec-0635-4e7b-b066-c0b9192ddb90",
       "name": "When clicking ‘Execute workflow’"
     },
     {
@@ -252,10 +252,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1760,
-        680
+        140,
+        620
       ],
-      "id": "228e6a83-c530-4e8d-99d6-ee21afe396df",
+      "id": "24212c67-8220-4e62-86b3-40ca4aff76e6",
       "name": "Sticky Note"
     },
     {
@@ -268,10 +268,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        600,
-        260
+        2500,
+        200
       ],
-      "id": "7e02ca86-1852-4176-9ede-45d47f4999d2",
+      "id": "75aa1e5d-4454-45db-90e4-eeff902da421",
       "name": "Sticky Note1"
     },
     {
@@ -323,16 +323,6 @@
                 "operation": "notEmpty",
                 "singleValue": true
               }
-            },
-            {
-              "id": "3dcb028f-5ca4-45c8-8418-4b037adf9a1c",
-              "leftValue": "={{ $json[\"Enter your n8n Base URL (The part before the first single slash)\"] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
             }
           ],
           "combinator": "and"
@@ -342,10 +332,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -1460,
-        820
+        440,
+        760
       ],
-      "id": "bb88dbdb-8d12-4064-b44a-8ef2e8ba33e7",
+      "id": "706ca2dd-19a0-43fd-9a75-6ca7f5844653",
       "name": "Checking Values are Set"
     },
     {
@@ -357,10 +347,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1520,
-        60
+        380,
+        0
       ],
-      "id": "68280268-0238-494a-99eb-dcc48847f778",
+      "id": "09c9a785-3fd9-4034-923d-f29fad691781",
       "name": "Sticky Note2"
     },
     {
@@ -373,10 +363,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -460,
-        720
+        1440,
+        660
       ],
-      "id": "5c515772-9451-48b5-abde-08cc122d64f0",
+      "id": "dc1d4241-18a8-4f98-8925-e2b4aa5a1cce",
       "name": "Sticky Note3"
     },
     {
@@ -388,10 +378,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1900,
-        60
+        0,
+        0
       ],
-      "id": "37c7b186-1284-41d6-b88e-efa880d3fb05",
+      "id": "119b50fa-5000-48a0-ae74-39cf800ff9bc",
       "name": "Sticky Note8"
     },
     {
@@ -401,7 +391,7 @@
             {
               "id": "d0ee4497-e902-40c5-8938-811bb206f6c8",
               "name": "workflow-files",
-              "value": "=[\n    {\n      \"file_type\": \"extract-text\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/InsightsLM___Extract_Text.json\"\n    },\n    {\n      \"file_type\": \"generate-notebook-details\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/InsightsLM___Generate_Notebook_Details.json\"\n    },\n    {\n      \"file_type\": \"upsert-to-vector-store\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/InsightsLM___Upsert_to_Vector_Store.json\"\n    },\n    {\n      \"file_type\": \"process-additional-sources\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/InsightsLM___Process_Additional_Sources.json\"\n    },\n    {\n      \"file_type\": \"chat\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/InsightsLM___Chat.json\"\n    },\n    {\n      \"file_type\": \"podcast-generation\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/InsightsLM___Podcast_Generation.json\"\n    }\n  ]",
+              "value": "=[\n    {\n      \"file_type\": \"extract-text\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/local-versions/InsightsLM___Extract_Text.json\"\n    },\n    {\n      \"file_type\": \"generate-notebook-details\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/local-versions/InsightsLM___Generate_Notebook_Details.json\"\n    },\n    {\n      \"file_type\": \"upsert-to-vector-store\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/local-versions/InsightsLM___Upsert_to_Vector_Store.json\"\n    },\n    {\n      \"file_type\": \"process-additional-sources\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/local-versions/InsightsLM___Process_Additional_Sources.json\"\n    },\n    {\n      \"file_type\": \"chat\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/local-versions/InsightsLM___Chat.json\"\n    },\n    {\n      \"file_type\": \"podcast-generation\",\n      \"file_url\": \"https://raw.githubusercontent.com/theaiautomators/insights-lm-public/main/n8n/local-versions/InsightsLM___Podcast_Generation.json\"\n    }\n  ]",
               "type": "array"
             }
           ]
@@ -411,10 +401,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1160,
-        820
+        740,
+        760
       ],
-      "id": "80720d73-9a93-4cb3-8d37-f3a6ea7e2ed0",
+      "id": "a9303a42-09bf-4a36-9e47-8065a7c5697f",
       "name": "Workflow File URLs to Download (Local Versions)"
     },
     {
@@ -424,10 +414,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -360,
-        880
+        1540,
+        820
       ],
-      "id": "6296f3e5-1308-497b-9311-ee56a5408b17",
+      "id": "a9a7840b-5b42-48d0-8497-ccb62c557bc9",
       "name": "Workflows Created!"
     }
   ],
@@ -598,12 +588,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "b23da8b9-460a-404a-b223-1f7e49e2e775",
+  "versionId": "f99b2533-4348-4d44-a0fa-74dca13d7a21",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "4f600cb49d3121f65c18400af1d03491e3934ff3323ac0ca2427a7ded76555c6"
   },
-  "id": "KmfgG9VEKak8S6Y9",
+  "id": "1Xt3aNvqmjHA0iqi",
   "tags": [
     {
       "createdAt": "2025-07-01T11:04:36.330Z",
