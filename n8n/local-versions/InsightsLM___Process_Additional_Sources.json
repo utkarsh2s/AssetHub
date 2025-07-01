@@ -280,7 +280,13 @@
         680
       ],
       "id": "2d78068b-0099-49cf-b7e9-c5c7e8f3ee51",
-      "name": "Supabase"
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "MynotebookLM Supabase"
+        }
+      }
     },
     {
       "parameters": {
@@ -318,7 +324,7 @@
       "name": "Upload File to Bucket",
       "credentials": {
         "supabaseApi": {
-          "id": "Xu0KXGzWTonMg1Rz",
+          "id": "OeYUddl4OaIohMCC",
           "name": "Supabase account"
         }
       }
@@ -345,7 +351,7 @@
       "name": "Upload File to Bucket1",
       "credentials": {
         "supabaseApi": {
-          "id": "Xu0KXGzWTonMg1Rz",
+          "id": "OeYUddl4OaIohMCC",
           "name": "Supabase account"
         }
       }
@@ -383,7 +389,13 @@
         320
       ],
       "id": "2eff9e35-3d56-4e6a-b84f-39be83ac1323",
-      "name": "Supabase1"
+      "name": "Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "Supabase account"
+        }
+      }
     },
     {
       "parameters": {
