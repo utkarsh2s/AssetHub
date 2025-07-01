@@ -58,7 +58,13 @@
         40
       ],
       "id": "7371c1cb-b91b-4d03-9199-44fe960c718b",
-      "name": "Postgres Chat Memory"
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "OuPBM6n0hyobX8h6",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -90,7 +96,13 @@
         -20
       ],
       "id": "833bf96e-4091-426e-bfee-39631663e1aa",
-      "name": "Supabase Vector Store"
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "MynotebookLM Supabase"
+        }
+      }
     },
     {
       "parameters": {
@@ -129,7 +141,13 @@
       ],
       "id": "1e45e3e9-f9f4-43e0-b2ef-46ec66a03e6d",
       "name": "Supabase",
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "MynotebookLM Supabase"
+        }
+      }
     },
     {
       "parameters": {

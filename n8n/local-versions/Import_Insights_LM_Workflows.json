@@ -217,6 +217,12 @@
               "name": "Enter the n8n Postgres Credential ID",
               "value": "",
               "type": "string"
+            },
+            {
+              "id": "4a8ab47c-538c-47c6-8d2e-fd5e975e1868",
+              "name": "Enter the Ollama Credential ID",
+              "value": "",
+              "type": "string"
             }
           ]
         },
@@ -323,6 +329,16 @@
                 "operation": "notEmpty",
                 "singleValue": true
               }
+            },
+            {
+              "id": "9d574103-9568-4434-a9f7-ffe0a09fdbc9",
+              "leftValue": "={{ $json['Enter the Ollama Credential ID'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
             }
           ],
           "combinator": "and"
@@ -409,7 +425,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// This script generates a single, structured output item.\n\n// Use a template literal (backticks) for the multi-line start message.\nconst start_message = `Success. Your n8n Workflows have been set up.`;\n\n// Return the final payload in the required n8n format (an array of items).\nreturn [\n  {\n    json: {\n      start_message: start_message\n    }\n  }\n];"
+        "jsCode": "// Loop over each input item passed to this node\nfor (const item of $input.all()) {\n  // Convert the JSON object of the current item into a string\n  let dataString = JSON.stringify(item.json);\n\n  // Perform the find-and-replace operations on the string version of the JSON.\n  // The 'g' flag in the regular expression ensures all instances are replaced.\n  const updatedString = dataString\n    .replace(/39evQ95L86jhtb3I/g, $('Enter User Values').first().json['Enter the n8n Custom Webhook Header Auth ID'])\n    .replace(/yfvmutoxmibqzvyklggr/g, $('Enter User Values').first().json['Enter Supabase Project ID'])\n    .replace(/OeYUddl4OaIohMCC/g, $('Enter User Values').first().json['Enter your n8n Supabase Credential ID'])\n    .replace(/LsXjXhCnYq30FMoC/g, $('Enter User Values').first().json['Enter the Ollama Credential ID'])\n    .replace(/OuPBM6n0hyobX8h6/g, $('Enter User Values').first().json['Enter the n8n Postgres Credential ID']);\n\n  // Convert the modified string back into a JSON object and\n  // overwrite the original JSON data of the item.\n  item.json = JSON.parse(updatedString);\n}\n\n// Return all the modified items to be passed to the next node in the workflow.\nreturn $input.all();"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
