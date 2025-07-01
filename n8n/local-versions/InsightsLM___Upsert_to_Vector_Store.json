@@ -46,7 +46,13 @@
       "retryOnFail": true,
       "maxTries": 5,
       "waitBetweenTries": 5000,
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "Supabase account"
+        }
+      }
     },
     {
       "parameters": {
@@ -149,7 +155,7 @@
       "name": "HTTP Request",
       "credentials": {
         "supabaseApi": {
-          "id": "Xu0KXGzWTonMg1Rz",
+          "id": "OeYUddl4OaIohMCC",
           "name": "Supabase account"
         }
       }
@@ -226,7 +232,13 @@
         320
       ],
       "id": "69901bf9-75b5-4f3d-aab3-69aaa9ea7c15",
-      "name": "Supabase"
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OeYUddl4OaIohMCC",
+          "name": "Supabase account"
+        }
+      }
     },
     {
       "parameters": {
