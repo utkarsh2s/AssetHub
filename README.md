@@ -28,6 +28,14 @@ We are open-sourcing InsightsLM so you can install it, customize it, improve it,
 </p>
 
 
+## Fully Local Version
+
+This version of InsightsLM relies on cloud AI services like OpenAI and Gemini.
+
+If you'd like to setup a fully local version of this that uses Ollama and Qwen3 along with Whisper and CoquiTTS, then check out our other repo below
+
+[Fully Local InsightsLM](https://github.com/theaiautomators/insights-lm-local-package)
+
 ## Join Our Community
 
 If you're interested in learning how to customize InsightsLM or build similar applications, join our community, The AI Automators.
