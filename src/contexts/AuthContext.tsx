@@ -43,6 +43,48 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const ensureUserProfile = async (user: User) => {
+    try {
+      console.log('AuthContext: Ensuring user profile exists for:', user.email);
+      
+      // Check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+      
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 is "not found" error, which is expected if profile doesn't exist
+        console.error('AuthContext: Error checking for existing profile:', fetchError);
+        return;
+      }
+      
+      if (!existingProfile) {
+        console.log('AuthContext: Creating new profile for user:', user.email);
+        
+        // Create new profile
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || null,
+            avatar_url: user.user_metadata?.avatar_url || null,
+          });
+        
+        if (insertError) {
+          console.error('AuthContext: Error creating profile:', insertError);
+        } else {
+          console.log('AuthContext: Profile created successfully');
+        }
+      } else {
+        console.log('AuthContext: Profile already exists');
+      }
+    } catch (err) {
+      console.error('AuthContext: Unexpected error ensuring user profile:', err);
+    }
+  };
   const clearAuthState = () => {
     console.log('AuthContext: Clearing auth state');
     setSession(null);
@@ -109,6 +151,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Handle sign in events
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           updateAuthState(newSession);
+          
+          // Ensure user profile exists after sign in
+          if (newSession?.user) {
+            ensureUserProfile(newSession.user);
+          }
+          
           setLoading(false);
           return;
         }
@@ -153,6 +201,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (mounted) {
           console.log('AuthContext: Initial session:', initialSession?.user?.email || 'No session');
           updateAuthState(initialSession);
+          
+          // Ensure user profile exists for existing session
+          if (initialSession?.user) {
+            ensureUserProfile(initialSession.user);
+          }
+          
           setLoading(false);
         }
       } catch (err) {
